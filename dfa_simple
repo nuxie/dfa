@@ -11,42 +11,18 @@ def random_walk(series, length):
         current = previous + series[i] - mean
         yield current
         previous = current
-        
-
-def create_segments(size, series):
-    # returns segments as 2 dim. matrix - a view into the array with the given shape
-    return np.reshape(series, ((len(series)//size), size))
 
 
-def trend_values(segmented_series):
-    # calculates and returns values of trend lines fitted to given segmented series:
-    result = np.zeros(shape=np.shape(segmented_series))
-    parameters = trend_lines(segmented_series)
+def fluctuation(segmented_series, deg):
+    # calculates root mean square deviation for each segment and returns its average
+    local_trend = np.zeros(shape=np.shape(segmented_series))
+    parameters = np.zeros(shape=(len(segmented_series), deg+1))
+    x = np.arange(1, len(segmented_series[0])+1)
+    for n, segment in enumerate(segmented_series):
+        parameters[n] = np.polyfit(x, segment, deg)
     x_values = np.arange(1, len(segmented_series[0]) + 1)
     for i in range(len(parameters)):
-        result[i] = np.polyval(parameters[i], x_values)
-    return result
-
-
-def trend_lines(segmented_series):
-    # fits trend lines to all given segments and returns their parameters
-    parameters = np.zeros(shape=(len(segmented_series), 2))
-    for n, segment in enumerate(segmented_series):
-        parameters[n] = least_squares(segment)
-    return parameters
-
-
-def least_squares(y):
-    # uses least squares to estimate the trend line in the segment y; returns m, c
-    # y = mx + c can be represented as y = Ap where A = [[x 1]] and p = [[m], [c]]
-    x = np.arange(1, len(y)+1)
-    A = np.vstack([x, np.ones(len(x))]).T
-    return np.linalg.lstsq(A, y, rcond=None)[0]
-
-
-def fluctuation(segmented_series):
-    # calculates root mean square deviation for each segment and returns its average
-    local_trend = trend_values(segmented_series)
+        local_trend[i] = np.polyval(parameters[i], x_values)
     rms = np.zeros(np.shape(segmented_series)[0])
     num = 0
     for actual, estimated in zip(segmented_series, local_trend):
@@ -68,15 +44,15 @@ def exponent(F, n, plot):
     return res
 
 
-def dfa(series, plot=0):
+def dfa(series, deg, plot=0):
     data_length = len(series)
     data = list(random_walk(series, data_length))
     max_exponent = np.log2(data_length)
     segments_sizes = (2 ** np.arange(2, max_exponent+1)).astype(int)
     fluctuations = np.zeros(len(segments_sizes))
     for i, size in enumerate(segments_sizes):
-        segmented_series = create_segments(size, data)
-        fluctuations[i] = fluctuation(segmented_series)
+        segmented_series = np.reshape(data, ((data_length//size), size))
+        fluctuations[i] = fluctuation(segmented_series, deg)
     return exponent(fluctuations, segments_sizes, plot)[0]
 
 
@@ -87,4 +63,10 @@ data = np.array(data.values.flatten())
 # white noise - DFA exponent should be near 0.5:
 # data = np.random.standard_normal(size=2048)
 
-print("DFA exponent for given time series equals:", dfa(data, plot=1))
+# pink noise - DFA exponent should be near 1.0:
+# data = powerlaw_psd_gaussian(1, 2048)
+
+# brown noise - DFA exponent should be near 1.5:
+# data = powerlaw_psd_gaussian(2, 2048)
+
+print("DFA exponent for given time series equals:", dfa(data, 1, plot=1))
