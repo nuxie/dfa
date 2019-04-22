@@ -41,6 +41,7 @@ def exponent(F, n, plot):
         plt.plot(np.log(n), res[0]*np.log(n) + res[1])
         plt.xlabel("log(n)")
         plt.ylabel("log(F(n))")
+        plt.show()
     return res
 
 
