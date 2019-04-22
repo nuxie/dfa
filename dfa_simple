@@ -65,10 +65,4 @@ data = np.array(data.values.flatten())
 # white noise - DFA exponent should be near 0.5:
 # data = np.random.standard_normal(size=2048)
 
-# pink noise - DFA exponent should be near 1.0:
-# data = powerlaw_psd_gaussian(1, 2048)
-
-# brown noise - DFA exponent should be near 1.5:
-# data = powerlaw_psd_gaussian(2, 2048)
-
 print("DFA exponent for given time series equals:", dfa(data, 1, plot=1))
