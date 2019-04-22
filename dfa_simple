@@ -15,12 +15,16 @@ def random_walk(series, length):
 
 def fluctuation(segmented_series, deg):
     # calculates root mean square deviation for each segment and returns its average
+    # also checks the continuity of estimated trend line
+    continuity = 1
     local_trend = np.zeros(shape=np.shape(segmented_series))
     parameters = np.zeros(shape=(len(segmented_series), deg+1))
     segment_size = len(segmented_series[0])
     for n, segment in enumerate(segmented_series):
         x = np.arange(n*segment_size+1, (n+1)*segment_size+1)
         parameters[n] = np.polyfit(x, segment, deg)
+    if continuity_test(parameters, segment_size, len(segmented_series)) == 0:
+        continuity = 0
     for i in range(len(parameters)):
         x_values = np.arange(i*segment_size+1, (i+1)*segment_size+1)
         local_trend[i] = np.polyval(parameters[i], x_values)
@@ -29,7 +33,19 @@ def fluctuation(segmented_series, deg):
     for actual, estimated in zip(segmented_series, local_trend):
         rms[num] = np.sqrt(np.mean((actual-estimated)**2))
         num += 1
-    return np.mean(rms)
+    return np.mean(rms), continuity
+
+
+def continuity_test(parameters, segment_len, segments_num):
+    testing_points = np.zeros(segments_num-1)
+    for j in range(0, segments_num-1):
+        testing_points[j] = (j+1)*segment_len + 0.5
+    for i in range(0, segments_num-1):
+        val1 = testing_points[i]*parameters[i][0] + parameters[i][1]
+        val2 = testing_points[i]*parameters[i+1][0] + parameters[i+1][1]
+        if round(val1, 2) != round(val2, 2):
+            return 0
+    return 1
 
 
 def exponent(F, n, plot):
@@ -52,9 +68,14 @@ def dfa(series, deg, plot=0):
     max_exponent = np.log2(data_length)
     segments_sizes = (2 ** np.arange(2, max_exponent+1)).astype(int)
     fluctuations = np.zeros(len(segments_sizes))
+    continuity = np.zeros(len(segments_sizes))
     for i, size in enumerate(segments_sizes):
         segmented_series = np.reshape(data, ((data_length//size), size))
-        fluctuations[i] = fluctuation(segmented_series, deg)
+        fluctuations[i], continuity[i] = fluctuation(segmented_series, deg)
+    if continuity.all() == 1:
+        print("Trend line is continous for all segments.")
+    else:
+        print("Trend line is not continous for at least one segment.")
     return exponent(fluctuations, segments_sizes, plot)[0]
 
 
