@@ -17,11 +17,12 @@ def fluctuation(segmented_series, deg):
     # calculates root mean square deviation for each segment and returns its average
     local_trend = np.zeros(shape=np.shape(segmented_series))
     parameters = np.zeros(shape=(len(segmented_series), deg+1))
-    x = np.arange(1, len(segmented_series[0])+1)
+    segment_size = len(segmented_series[0])
     for n, segment in enumerate(segmented_series):
+        x = np.arange(n*segment_size+1, (n+1)*segment_size+1)
         parameters[n] = np.polyfit(x, segment, deg)
-    x_values = np.arange(1, len(segmented_series[0]) + 1)
     for i in range(len(parameters)):
+        x_values = np.arange(i*segment_size+1, (i+1)*segment_size+1)
         local_trend[i] = np.polyval(parameters[i], x_values)
     rms = np.zeros(np.shape(segmented_series)[0])
     num = 0
