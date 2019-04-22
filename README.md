@@ -1,2 +1,2 @@
-# dfa
-detrended fluctuation analysis with continuous trend line
+# DFA
+Detrended Fluctuation Analysis with continuous trend line
