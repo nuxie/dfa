@@ -80,10 +80,10 @@ def dfa(series, deg, plot=0):
 
 
 url = 'https://raw.githubusercontent.com/nuxie/dfa/master/time_series.txt'
-data = pandas.read_csv(url, header=None)
-data = np.array(data.values.flatten())
+ts = pandas.read_csv(url, header=None)
+ts = np.array(ts.values.flatten())
 
 # white noise - DFA exponent should be near 0.5:
-# data = np.random.standard_normal(size=2048)
+# ts = np.random.standard_normal(size=2048)
 
-print("DFA exponent for given time series equals:", dfa(data, 1, plot=1))
+print("DFA exponent for given time series equals:", dfa(ts, 2, plot=1))
