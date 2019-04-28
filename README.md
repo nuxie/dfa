@@ -20,7 +20,7 @@ This repository consists of 3 files:
 We are looking for the minimum of the given form:
 
 
-![form](http://latex.codecogs.com/png.latex?%5Cdpi%7B150%7D%20F%20%3D%20%5Cfrac%7B1%7D%7B2%7Dp%5ETQp%20&plus;%20c%5ETp) where 
+![form](http://latex.codecogs.com/png.latex?%5Cdpi%7B150%7D%20F%20%3D%20%5Cfrac%7B1%7D%7B2%7Dp%5ETQp%20&plus;%20c%5ETp)
 
 with a continuity condition given by the following equation:
 
