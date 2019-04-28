@@ -12,7 +12,9 @@ This repository consists of 3 files:
 * dfa.py - DFA method implementation with the trend line continuity condition; it uses calculate_trend function defined in the continuous_trend.py file; at the moment the trend is linear but it will be implemented as a quadratic function
 
 <br>
+
 <b>Mathematics behind finding the DFA exponent for the continuous trend line</b>
+
 <br>
 
 We are looking for the minimum of the given form:
