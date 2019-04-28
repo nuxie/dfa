@@ -5,24 +5,12 @@ import matplotlib.pyplot as plt
 
 
 def random_walk(series, length):
-    # converts the series into a "random walk" - cumulative sum
     mean = np.mean(series)
     previous = series[0] - mean
     for i in range(0, length):
         current = previous + series[i] - mean
         yield current
         previous = current
-
-
-def testplot(data, result, segment_len, segments_num):
-    for k in range(0, segments_num):
-        x = np.arange(k*segment_len + 1, (k+1)*segment_len + 1)
-        y = np.zeros(len(x))
-        for j in range(0, segment_len):
-            y[j] = x[j] * result[k*2] + result[k*2 + 1]
-        plt.plot(x, y)
-    plt.plot(np.arange(1, len(data)+1), data, 'o', markersize=1)
-    plt.show()
 
 
 def fluctuation(segmented_series, parameters):
@@ -63,7 +51,6 @@ def dfa(series, plot=0):
         segmented_series = np.reshape(data, ((data_length//size), size))
         parameters = calculate_trend(segmented_series)
         fluctuations[i] = fluctuation(segmented_series, parameters)
-        # testplot(data, parameters, len(segmented_series[0]), len(segmented_series))
     return exponent(fluctuations, segments_sizes, plot)[0]
 
 
