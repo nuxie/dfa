@@ -8,7 +8,7 @@ def random_walk(series, length):
     """ Converts the series into a random walk using cumulative sum.
 
     :param series: time series to be converted
-    :type series: np.array
+    :type series: numpy.array
 
     :param length: length of the resulting random walk
     :type length: int
@@ -28,10 +28,10 @@ def fluctuation(segmented_series, parameters):
     Fluctuation - root-mean-square deviation from the fitted trend.
 
     :param segmented_series: series divided into segments
-    :type segmented_series: np.array
+    :type segmented_series: numpy.array
     :param parameters: parameters of the fitted trend lines,
                        shape=len(segmented_series)=number of segments
-    :type parameters: np.array
+    :type parameters: numpy.array
 
     :return: fluctuation value for the segmented series
     :rtype: float
@@ -55,9 +55,9 @@ def exponent(F, n, plot):
         sizes and returns its parameters - slope and intercept.
 
     :param F: fluctuations calculated for segmented series of each size
-    :type F: np.array
+    :type F: numpy.array
     :param n: segments sizes corresponding to F values
-    :type n: np.array
+    :type n: numpy.array
     :param plot: indicates if the plot of the fitted line should be shown
     :type plot: int
 
@@ -81,7 +81,7 @@ def dfa(series, plot=0):
         fluctuations against segments sizes, which is the DFA exponent.
 
     :param series: time series for which to calculate the DFA exponent
-    :type series: np.array
+    :type series: numpy.array
     :param plot: optional, defaults to 0
                  indicates if the plot of the fitted line should be shown
     :type plot: int
