@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.linalg import spsolve
 
 
 def continuity_matrix(segments_num, segments_size):
@@ -62,12 +64,12 @@ def Q_matrix(segments_num, segments_size):
 
 
 def equation_matrices(series, segments_num, Q, E):
-    """ Returns M matrix (merged Q and E) and cd matrix used on the
-    right-hand side of the set of equations.
+    """ Returns LHS matrix (merged Q and E) and RHS matrix used to
+     solve the set of equations.
 
-    M matrix is the leftmost matrix from the set of the equations.
+    LHS matrix is the leftmost matrix from the set of the equations.
     It consists of E and Q matrices that are properly positioned.
-    The right-hand side of the equation is the cd matrix.
+    The right-hand side of the equation is the RHS matrix.
 
     :param series: time series in segmented or normal form
     :type series: np.array
@@ -80,34 +82,35 @@ def equation_matrices(series, segments_num, Q, E):
               shape=(segments_num-1, 4+(segments_num-2)*2)
     :type E: np.array
 
-    :return: M matrix, shape=(matrix_size, matrix_size)
-             cd matrix, shape=matrix_size
+    :return: LHS matrix, shape=(matrix_size, matrix_size)
+             RHS matrix, shape=matrix_size
     :rtype: (np.array, np.array)
     """
 
+    data, row, col = [], [], []
     segments_size = len(series[0])
     matrix_size = 2*segments_num + (segments_num-1)
-    cd = np.zeros(shape=matrix_size)
-    M = np.zeros(shape=(matrix_size, matrix_size))
+    rhs = np.zeros(shape=matrix_size)
     series = series.flatten()
     for w in range(0, segments_num):
-        M[w*2][w*2] = Q[w][0][0]
-        M[w*2][w*2 + 1] = Q[w][0][1]
-        M[w*2 + 1][w*2] = Q[w][1][0]
-        M[w*2 + 1][w*2 + 1] = Q[w][1][1]
+        row.extend([w*2] * 2 + [w*2 + 1] * 2)
+        col.extend([w*2, w*2+1, w*2, w*2+1])
+        data.extend([Q[w][0][0], Q[w][0][1], Q[w][1][0], Q[w][1][1]])
         sum_xi_i = 0
         sum_xi = 0
         for j in range((w*segments_size)+1, (w+1)*segments_size+1):
             sum_xi_i += j * series[j-1]
             sum_xi += series[j-1]
-        cd[2*w] = sum_xi_i
-        cd[2*w + 1] = sum_xi
+        rhs[2*w] = sum_xi_i
+        rhs[2*w + 1] = sum_xi
     for v in range(segments_num*2, matrix_size):
         for i in range(0, 4):
             tmp = E[(v-segments_num*2)][(v-segments_num*2)*2+i]
-            M[v][(v-segments_num*2)*2+i] = tmp
-            M[(v-segments_num*2)*2+i][v] = tmp
-    return M, cd
+            row.extend([v, (v-segments_num*2)*2+i])
+            col.extend([(v-segments_num*2)*2+i, v])
+            data.extend([tmp] * 2)
+    lhs = csr_matrix((data, (row, col)), shape=(matrix_size, matrix_size))
+    return lhs, rhs
 
 
 def calculate_trend(segmented_series):
@@ -131,7 +134,7 @@ def calculate_trend(segmented_series):
     E = continuity_matrix(segments_num, segments_size)
     Q = Q_matrix(segments_num, segments_size)
     lhs, rhs = equation_matrices(segmented_series, segments_num, Q, E)
-    parameters = np.linalg.solve(lhs, rhs) # LAPACK routine _gesv - uses LU decomposition
+    parameters = spsolve(lhs, rhs)
     if continuity_test(parameters, segments_size, len(segmented_series)) == 0:
         raise ValueError('Trend line is not continous')
     return parameters[:-segments_num+1]
