@@ -3,8 +3,6 @@
 Detrended Fluctuation Analysis with continuous trend line.
 Detailed information on the algorithm can be found on Wikipedia (https://en.wikipedia.org/wiki/Detrended_fluctuation_analysis).
 
-This repository consists of 3 files:
-
 * dfa_simple.py - a simple, basic implementation of the DFA method without the trend line continuity condition; the trend is represented as a quadratic function
 
 * continuous_trend.py - given segmented series as an input, it allows to calculate linear trends that are continuous in every "middle point" (uses quadratic programming)
