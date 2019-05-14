@@ -16,8 +16,8 @@ def continuity_matrix(segments_num, segments_size):
     :param segments_size: size of one segment in the segmented series
     :type segments_size: int
 
-    :return: E matrix in a form of list
-    :rtype: 2dim list, shape=(segments_num-1, 4+(segments_num-2)*2)
+    :return: E matrix, shape=(segments_num-1, 4+(segments_num-2)*2)
+    :rtype: numpy.array
     """
 
     E = np.zeros(shape=(segments_num-1, 4+(segments_num-2)*2))
@@ -46,7 +46,7 @@ def Q_matrix(segments_num, segments_size):
     :type segments_size: int
 
     :return: Q matrix, shape=(segments_num, 2, 2)
-    :rtype: np.array
+    :rtype: numpy.array
     """
 
     Q = np.zeros(shape=(segments_num, 2, 2))
@@ -72,19 +72,19 @@ def equation_matrices(series, segments_num, Q, E):
     The right-hand side of the equation is the RHS matrix.
 
     :param series: time series in segmented or normal form
-    :type series: np.array
+    :type series: numpy.array
     :param segments_num: number of segments in the segmented series
     :type segments_num: int
     :param Q: Q matrix derived from DFA method conditions
               shape=(segments_num, 2, 2)
-    :type Q: np.array
+    :type Q: numpy.array
     :param E: E matrix derived from continuity condition
               shape=(segments_num-1, 4+(segments_num-2)*2)
-    :type E: np.array
+    :type E: numpy.array
 
     :return: LHS matrix, shape=(matrix_size, matrix_size)
              RHS matrix, shape=matrix_size
-    :rtype: (np.array, np.array)
+    :rtype: (scipy.sparse.csr.csr_matrix, numpy.array)
     """
 
     data, row, col = [], [], []
@@ -110,6 +110,7 @@ def equation_matrices(series, segments_num, Q, E):
             col.extend([(v-segments_num*2)*2+i, v])
             data.extend([tmp] * 2)
     lhs = csr_matrix((data, (row, col)), shape=(matrix_size, matrix_size))
+    print(type(lhs))
     return lhs, rhs
 
 
@@ -123,10 +124,10 @@ def calculate_trend(segmented_series):
     The list is returned without the redundant lambda values.
 
     :param segmented_series: series divided into segments
-    :type segmented_series: np.array
+    :type segmented_series: numpy.array
 
     :return: parameters of the trend line, shape=segments_num
-    :rtype: np.array
+    :rtype: numpy.array
     """
 
     segments_num = len(segmented_series)
@@ -145,7 +146,7 @@ def continuity_test(parameters, segment_len, segments_num):
 
     :param parameters: parameters of the fitted trend lines,
                        shape=segments_num
-    :type parameters: np.array
+    :type parameters: numpy.array
     :param segment_len: size of one segment in the segmented series
     :type segment_len: int
     :param segments_num: number of segments in the segmented series
