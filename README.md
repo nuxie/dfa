@@ -1,7 +1,9 @@
 # DFA
 
 Detrended Fluctuation Analysis with continuous trend line.
+
 Thesis: https://www.ap.uj.edu.pl/diplomas/133408/?_s=1
+
 Detailed information on the algorithm can be found on Wikipedia (https://en.wikipedia.org/wiki/Detrended_fluctuation_analysis).
 
 * dfa_simple.py - a simple, basic implementation of the DFA method without the trend line continuity condition; the trend is represented as a quadratic function
